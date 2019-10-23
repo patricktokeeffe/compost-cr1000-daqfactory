@@ -1,0 +1,54 @@
+' Acquire data from soil probes and thermocouples, and send to DAQFactory
+' 
+' Copyright 2019 Patrick O'Keeffe <pokeeffe@wsu.edu> for Washington State University
+
+'Specify thermocouple, valid options = {TypeT, TypeE, TypeK, TypeJ, TypeB,
+'TypeR, TypeS, TypeN}
+Const TC_TYPE = TypeT
+
+
+Const SCAN_INTV = 5 'seconds, how frequently to query sensors
+Const DATA_INTV = 60 'seconds, how often to write data to table/serial port
+
+
+
+' Thermocouple inputs
+Public panel_tmpr
+Public tcdata(4)
+Alias tcdata(1) = TC1_tmpr
+Alias tcdata(2) = TC2_tmpr
+Alias tcdata(3) = TC3_tmpr
+Alias tcdata(4) = TC4_tmpr
+Units panel_tmpr = degC
+Units tcdata = degC
+
+
+DataTable(compost_soil,True,-1)
+  'No cardout() instruction
+  DataInterval(0,DATA_INTV,Sec,5)
+  Average(1,TC1_tmpr,IEEE4,TC1_tmpr=NAN)
+  Average(1,TC2_tmpr,IEEE4,TC2_tmpr=NAN)
+  Average(1,TC3_tmpr,IEEE4,TC3_tmpr=NAN)
+  Average(1,TC4_tmpr,IEEE4,TC4_tmpr=NAN)
+EndTable
+
+
+DisplayMenu("Compost soil probes",-2)
+  DisplayValue("TC #1", TC1_tmpr)
+  DisplayValue("TC #2", TC2_tmpr)
+  DisplayValue("TC #3", TC3_tmpr)
+  DisplayValue("TC #4", TC4_tmpr)
+EndMenu
+
+
+BeginProg
+	Scan (SCAN_INTV,Sec,0,0)
+	  
+    PanelTemp(panel_tmpr,_60Hz)
+	  TCDiff(tcdata,4,mV25,1,TC_TYPE,panel_tmpr,1,0,_60Hz,1,0)
+
+
+    CallTable(compost_soil)
+	NextScan
+EndProg
+

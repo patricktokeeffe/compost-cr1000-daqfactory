@@ -22,6 +22,7 @@ Alias tcdata(4) = TC4_tmpr
 Units panel_tmpr = degC
 Units tcdata = degC
 
+Alias sdidata(11) = SS_9_T
 
 DataTable(compost_soil,True,-1)
   'No cardout() instruction

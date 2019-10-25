@@ -52,22 +52,22 @@ Alias sdidata(17) = SS_C_T
 Alias sdidata(18) = SS_C_VWC
 Units SS_7_E   = dimless
 Units SS_7_T   = degC
-Units SS_7_VWC = percent
+Units SS_7_VWC = m^3/m^3
 Units SS_8_E   = dimless
 Units SS_8_T   = degC
-Units SS_8_VWC = percent
+Units SS_8_VWC = m^3/m^3
 Units SS_9_E   = dimless
 Units SS_9_T   = degC
-Units SS_9_VWC = percent
+Units SS_9_VWC = m^3/m^3
 Units SS_A_E   = dimless
 Units SS_A_T   = degC
-Units SS_A_VWC = percent
+Units SS_A_VWC = m^3/m^3
 Units SS_B_E   = dimless
 Units SS_B_T   = degC
-Units SS_B_VWC = percent
+Units SS_B_VWC = m^3/m^3
 Units SS_C_E   = dimless
 Units SS_C_T   = degC
-Units SS_C_VWC = percent
+Units SS_C_VWC = m^3/m^3
 
 
 Const SERIAL_BUFF = 80
@@ -133,7 +133,7 @@ EndMenu
 
 
 Function Topp_equation( dielectric )
-  'Calculate volumetric water content (percent) using Topp equation (Topp et al 1980)
+  'Calculate volumetric water content using Topp equation (Topp et al 1980)
   Return 4.3e-6*dielectric^3 - 5.5e-4*dielectric^2 + 2.92e-2*dielectric - 5.3e-2
 EndFunction
 

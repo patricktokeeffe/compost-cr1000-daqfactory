@@ -136,8 +136,14 @@ curve.
 
 ## References
 
+* Campbell Scientific. *CR1000 Datalogger Operator's Manual.* Retrieved
+  [2019-10-24](http://web.archive.org/web/20191025003939/https://s.campbellsci.com/documents/us/manuals/cr1000.pdf).
+  Online: <https://s.campbellsci.com/documents/us/manuals/cr1000.pdf>
+
 * <a href="user-manual" />Decagon Devices. *5TM Water Content and Temperature
   Sensors Operator's Manual.* Version 0.
 
-* vineyard flux program, for scadabr integration
-  https://github.com/patricktokeeffe/2015-vineyard-eddyflux-tower/blob/master/src/default.cr3
+* O'Keeffe, Patrick. *Vineyard Pilot Study Eddy Flux Tower Program.* Retrieved
+  [2019-10-24](https://github.com/patricktokeeffe/2015-vineyard-eddyflux-tower/commit/bbd5e890accc49a4277fa2494571d528c783dc85).
+  Online: <https://github.com/patricktokeeffe/2015-vineyard-eddyflux-tower>
+

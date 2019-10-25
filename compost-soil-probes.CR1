@@ -70,11 +70,15 @@ Units SS_C_T   = degC
 Units SS_C_VWC = percent
 
 
+Const SERIAL_BUFF = 80
+Const CRLF = CHR(13) & CHR(10) '<CR><LF> delimiter
+Dim outdata(22)
+
 
 DataTable(compost_soil,True,-1)
   'No cardout() instruction
   DataInterval(0,DATA_INTV,Sec,5)
-  Average(1,TC1_tmpr,IEEE4,TC1_tmpr=NAN)
+  Average(1,TC1_tmpr,IEEE4,TC1_tmpr=NAN) 'outdata(1)
   Average(1,TC2_tmpr,IEEE4,TC2_tmpr=NAN)
   Average(1,TC3_tmpr,IEEE4,TC3_tmpr=NAN)
   Average(1,TC4_tmpr,IEEE4,TC4_tmpr=NAN)
@@ -134,7 +138,36 @@ Function Topp_equation( dielectric )
 EndFunction
 
 
+Sub report_to_daqfactory()
+  'Create and send strings to serial port "ComRS232" (front panel DB9)
+  Dim msg As String * SERIAL_BUFF
+  
+  Sprintf(msg,"TC,%f,%f,%f,%f",outdata(1),outdata(2),outdata(3),outdata(4))
+  SerialOut(ComRS232,msg & CRLF,"",0,0)
+  Delay(1,1,Sec)
+  Sprintf(msg,"SS,7,%f,%f,%f",outdata(5),outdata(11),outdata(17))
+  SerialOut(ComRS232,msg & CRLF,"",0,0)
+  Delay(1,1,Sec)
+  Sprintf(msg,"SS,8,%f,%f,%f",outdata(6),outdata(12),outdata(18))
+  SerialOut(ComRS232,msg & CRLF,"",0,0)
+  Delay(1,1,Sec)
+  Sprintf(msg,"SS,9,%f,%f,%f",outdata(7),outdata(13),outdata(19))
+  SerialOut(ComRS232,msg & CRLF,"",0,0)
+  Delay(1,1,Sec)
+  Sprintf(msg,"SS,A,%f,%f,%f",outdata(8),outdata(14),outdata(20))
+  SerialOut(ComRS232,msg & CRLF,"",0,0)
+  Delay(1,1,Sec)
+  Sprintf(msg,"SS,B,%f,%f,%f",outdata(9),outdata(15),outdata(21))
+  SerialOut(ComRS232,msg & CRLF,"",0,0)
+  Delay(1,1,Sec)
+  Sprintf(msg,"SS,C,%f,%f,%f",outdata(10),outdata(16),outdata(22))
+  SerialOut(ComRS232,msg & CRLF,"",0,0)
+EndSub
+
+
 BeginProg
+  SerialOpen(ComRS232,115200,0,0,SERIAL_BUFF)
+
 	Scan (SCAN_INTV,Sec,0,0)
 	  
     PanelTemp(panel_tmpr,_60Hz)
@@ -185,6 +218,10 @@ BeginProg
     EndIf
     
     CallTable(compost_soil)
+    If (compost_soil.Output(1,1)) Then
+      GetRecord(outdata(1),compost_soil,1)
+      report_to_daqfactory()
+    EndIf
 	NextScan
 EndProg
 

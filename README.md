@@ -47,6 +47,40 @@ the sensor.
 | Ground      | *bare* | G      |
 | Data output | red    | 12V    |
 
+### DAQFactory Computer
+
+Use a serial cable and usb serial adapter, if needed, to connect the DAQFactory
+computer to the `RS-232` port of the CR1000. The serial port configuration is
+`115200/8/n/1`.
+
+Each minute, after the data table record is generated, the stored data is then
+reported out the RS-232 serial port as a series of comma-delimited strings:
+
+* Each record:
+    * is prefixed with either `TC` or `SS`
+    * arrives 1-second after the previous record
+    * and is delimited with a carriage return and line feed (`\r\n`)
+* Line 1 contains thermocouple (TC) data for differential input channels
+  1, 2, 3, and 4, respectively.
+* Lines 2-7 contain soil sensor (SS) data organized by sensor ID
+    * Field 2 contains the soil sensor ID (`7`-`C`)
+    * Field 3 contains the temperature (degC)
+    * Field 4 contains the volumetric water content (m^3/m^3)
+    * Field 5 contains the apparent dielectric permittivity value (dimless)
+
+Example output from CR1000 serial port (non-printing characters escaped for
+clarity):
+```
+TC,22.578640,-76.386620,91.653840,109.250300\r\n
+SS,7,13.008330,0.120773,6.768334\r\n
+SS,8,11.866670,0.140369,7.661666\r\n
+SS,9,12.116670,0.153912,8.299166\r\n
+SS,A,21.600000,0.328149,18.648330\r\n
+SS,B,21.208330,0.342396,19.758330\r\n
+SS,C,22.025000,0.320539,18.078330\r\n
+```
+
+
 ## Data Products
 
 The logger queries sensors for new values every 5 seconds and stores averaged

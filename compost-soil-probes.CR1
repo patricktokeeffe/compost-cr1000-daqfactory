@@ -1,15 +1,22 @@
-' Acquire data from soil probes and thermocouples, and send to DAQFactory
+'Acquire data from soil probes and thermocouples, and send to DAQFactory
 ' 
-' Copyright 2019 Patrick O'Keeffe <pokeeffe@wsu.edu> for Washington State University
+'Copyright 2019 Patrick O'Keeffe <pokeeffe@wsu.edu> for Washington State University
+'
+'Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
+'
+'THE SOFTWARE Is PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD To THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE For ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, Data OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 'Specify thermocouple, valid options = {TypeT, TypeE, TypeK, TypeJ, TypeB,
 'TypeR, TypeS, TypeN}
 Const TC_TYPE = TypeT
 
 
+'Specify program timing
 Const SCAN_INTV = 5 'seconds, how frequently to query sensors
 Const DATA_INTV = 60 'seconds, how often to write data to table/serial port
 
+'Specify port for SDI comms
+Const SDI_PORT = 1 'C1
 
 
 ' Thermocouple inputs
@@ -22,7 +29,47 @@ Alias tcdata(4) = TC4_tmpr
 Units panel_tmpr = degC
 Units tcdata = degC
 
-Alias sdidata(11) = SS_9_T
+'Soil moisture/tmpr probe inputs
+'HINT: SS = soil sensor
+Public sdidata(6*3)
+Alias sdidata(1)  = SS_7_E
+Alias sdidata(2)  = SS_7_T
+Alias sdidata(3)  = SS_7_VWC
+Alias sdidata(4)  = SS_8_E
+Alias sdidata(5)  = SS_8_T
+Alias sdidata(6)  = SS_8_VWC
+Alias sdidata(7)  = SS_9_E
+Alias sdidata(8)  = SS_9_T
+Alias sdidata(9)  = SS_9_VWC
+Alias sdidata(10) = SS_A_E
+Alias sdidata(11) = SS_A_T
+Alias sdidata(12) = SS_A_VWC
+Alias sdidata(13) = SS_B_E
+Alias sdidata(14) = SS_B_T
+Alias sdidata(15) = SS_B_VWC
+Alias sdidata(16) = SS_C_E
+Alias sdidata(17) = SS_C_T
+Alias sdidata(18) = SS_C_VWC
+Units SS_7_E   = dimless
+Units SS_7_T   = degC
+Units SS_7_VWC = percent
+Units SS_8_E   = dimless
+Units SS_8_T   = degC
+Units SS_8_VWC = percent
+Units SS_9_E   = dimless
+Units SS_9_T   = degC
+Units SS_9_VWC = percent
+Units SS_A_E   = dimless
+Units SS_A_T   = degC
+Units SS_A_VWC = percent
+Units SS_B_E   = dimless
+Units SS_B_T   = degC
+Units SS_B_VWC = percent
+Units SS_C_E   = dimless
+Units SS_C_T   = degC
+Units SS_C_VWC = percent
+
+
 
 DataTable(compost_soil,True,-1)
   'No cardout() instruction
@@ -31,15 +78,60 @@ DataTable(compost_soil,True,-1)
   Average(1,TC2_tmpr,IEEE4,TC2_tmpr=NAN)
   Average(1,TC3_tmpr,IEEE4,TC3_tmpr=NAN)
   Average(1,TC4_tmpr,IEEE4,TC4_tmpr=NAN)
+  
+  Average(1,SS_7_T,IEEE4,SS_7_T=NAN)     'outdata(5)
+  Average(1,SS_8_T,IEEE4,SS_8_T=NAN)
+  Average(1,SS_9_T,IEEE4,SS_9_T=NAN)
+  Average(1,SS_A_T,IEEE4,SS_A_T=NAN)
+  Average(1,SS_B_T,IEEE4,SS_B_T=NAN)
+  Average(1,SS_C_T,IEEE4,SS_C_T=NAN)
+  Average(1,SS_7_VWC,IEEE4,SS_7_VWC=NAN) 'outdata(11)
+  Average(1,SS_8_VWC,IEEE4,SS_8_VWC=NAN)
+  Average(1,SS_9_VWC,IEEE4,SS_9_VWC=NAN)
+  Average(1,SS_A_VWC,IEEE4,SS_A_VWC=NAN)
+  Average(1,SS_B_VWC,IEEE4,SS_B_VWC=NAN)
+  Average(1,SS_C_VWC,IEEE4,SS_C_VWC=NAN)
+  Average(1,SS_7_E,IEEE4,SS_7_E=NAN)     'outdata(17)
+  Average(1,SS_8_E,IEEE4,SS_8_E=NAN)
+  Average(1,SS_9_E,IEEE4,SS_9_E=NAN)
+  Average(1,SS_A_E,IEEE4,SS_A_E=NAN)
+  Average(1,SS_B_E,IEEE4,SS_B_E=NAN)
+  Average(1,SS_C_E,IEEE4,SS_C_E=NAN)
 EndTable
 
 
 DisplayMenu("Compost soil probes",-2)
-  DisplayValue("TC #1", TC1_tmpr)
-  DisplayValue("TC #2", TC2_tmpr)
-  DisplayValue("TC #3", TC3_tmpr)
-  DisplayValue("TC #4", TC4_tmpr)
+  DisplayValue("TC DF1", TC1_tmpr)
+  DisplayValue("TC DF2", TC2_tmpr)
+  DisplayValue("TC DF3", TC3_tmpr)
+  DisplayValue("TC DF4", TC4_tmpr)
+  DisplayValue("SS #7 tmpr", SS_7_T)
+  DisplayValue("SS #8 tmpr", SS_8_T)
+  DisplayValue("SS #9 tmpr", SS_9_T)
+  DisplayValue("SS #A tmpr", SS_A_T)
+  DisplayValue("SS #B tmpr", SS_B_T)
+  DisplayValue("SS #C tmpr", SS_C_T)
+  
+  DisplayValue("SS #7 vwc", SS_7_VWC)
+  DisplayValue("SS #8 vwc", SS_8_VWC)
+  DisplayValue("SS #9 vwc", SS_9_VWC)
+  DisplayValue("SS #A vwc", SS_A_VWC)
+  DisplayValue("SS #B vwc", SS_B_VWC)
+  DisplayValue("SS #C vwc", SS_C_VWC)
+
+  DisplayValue("SS #7 E", SS_7_E)
+  DisplayValue("SS #8 E", SS_8_E)
+  DisplayValue("SS #9 E", SS_9_E)
+  DisplayValue("SS #A E", SS_A_E)
+  DisplayValue("SS #B E", SS_B_E)
+  DisplayValue("SS #C E", SS_C_E)
 EndMenu
+
+
+Function Topp_equation( dielectric )
+  'Calculate volumetric water content (percent) using Topp equation (Topp et al 1980)
+  Return 4.3e-6*dielectric^3 - 5.5e-4*dielectric^2 + 2.92e-2*dielectric - 5.3e-2
+EndFunction
 
 
 BeginProg
@@ -49,6 +141,49 @@ BeginProg
 	  TCDiff(tcdata,4,mV25,1,TC_TYPE,panel_tmpr,1,0,_60Hz,1,0)
 
 
+
+    SDI12Recorder(SS_7_E,SDI_PORT,"7","M!",1,0)
+    If (SS_7_E = NAN) Then
+      Move(SS_7_T,2,NAN,1)
+    Else
+      SS_7_VWC = Topp_equation(SS_7_E)
+    EndIf
+
+    SDI12Recorder(SS_8_E,SDI_PORT,"8","M!",1,0)
+    If (SS_8_E = NAN) Then
+      Move(SS_8_T,2,NAN,1)
+    Else
+      SS_8_VWC = Topp_equation(SS_8_E)
+    EndIf
+
+    SDI12Recorder(SS_9_E,SDI_PORT,"9","M!",1,0)
+    If (SS_9_E = NAN) Then
+      Move(SS_9_T,2,NAN,1)
+    Else
+      SS_9_VWC = Topp_equation(SS_9_E)
+    EndIf
+
+    SDI12Recorder(SS_A_E,SDI_PORT,"A","M!",1,0)
+    If (SS_A_E = NAN) Then
+      Move(SS_A_T,2,NAN,1)
+    Else
+      SS_A_VWC = Topp_equation(SS_A_E)
+    EndIf
+
+    SDI12Recorder(SS_B_E,SDI_PORT,"B","M!",1,0)
+    If (SS_B_E = NAN) Then
+      Move(SS_B_T,2,NAN,1)
+    Else
+      SS_B_VWC = Topp_equation(SS_B_E)
+    EndIf
+
+    SDI12Recorder(SS_C_E,SDI_PORT,"C","M!",1,0)
+    If (SS_C_E = NAN) Then
+      Move(SS_C_T,2,NAN,1)
+    Else
+      SS_C_VWC = Topp_equation(SS_C_E)
+    EndIf
+    
     CallTable(compost_soil)
 	NextScan
 EndProg

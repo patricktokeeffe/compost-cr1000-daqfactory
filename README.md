@@ -50,11 +50,14 @@ the sensor.
 ### DAQFactory Computer
 
 Use a serial cable and usb serial adapter, if needed, to connect the DAQFactory
-computer to the `RS-232` port of the CR1000. The serial port configuration is
-`115200/8/n/1`.
+computer to the `RS-232` port of the CR1000. The serial port configuration is:
+* Baud rate: `115200`
+* Data bits: `8`
+* Parity: `none`
+* Stop bits: `1`
 
-Each minute, after the data table record is generated, the stored data is then
-reported out the RS-232 serial port as a series of comma-delimited strings:
+Each minute, after the data table record is generated, the new data record is
+reported out the RS-232 serial port as a series of comma-delimited strings.
 
 * Each record:
     * is prefixed with either `TC` or `SS`
@@ -68,8 +71,9 @@ reported out the RS-232 serial port as a series of comma-delimited strings:
     * Field 4 contains the volumetric water content (m^3/m^3)
     * Field 5 contains the apparent dielectric permittivity value (dimless)
 
-Example output from CR1000 serial port (non-printing characters escaped for
-clarity):
+Example CR1000 serial port output (non-printing characters shown for clarity):
+> *(Only thermocouple DF1 is attached in this example data stream... disregard
+> the strange temperature values.)*
 ```
 TC,22.578640,-76.386620,91.653840,109.250300\r\n
 SS,7,13.008330,0.120773,6.768334\r\n
@@ -85,7 +89,7 @@ SS,C,22.025000,0.320539,18.078330\r\n
 
 The logger queries sensors for new values every 5 seconds and stores averaged
 values at the start of each minute. The record is stored to internal memory
-and transmitted out the RS-232 serial port as a series of delimited strings.
+in a ring-fill mode (e.g. newest overwrites oldest when full).
 
 * Base name: `compost_soil`
 * Record interval: 1 minute
@@ -111,18 +115,18 @@ curve.
 | SS_A_T_Avg    | degC    | temperature from 5TM probe with ID A |
 | SS_B_T_Avg    | degC    | temperature from 5TM probe with ID B |
 | SS_C_T_Avg    | degC    | temperature from 5TM probe with ID C |
-| SS_7_VWC_Avg  | percent | volumetric water content from 5TM probe with ID 7 |
-| SS_8_VWC_Avg  | percent | volumetric water content from 5TM probe with ID 8 |
-| SS_9_VWC_Avg  | percent | volumetric water content from 5TM probe with ID 9 |
-| SS_A_VWC_Avg  | percent | volumetric water content from 5TM probe with ID A |
-| SS_B_VWC_Avg  | percent | volumetric water content from 5TM probe with ID B |
-| SS_C_VWC_Avg  | percent | volumetric water content from 5TM probe with ID C |
-| SS_7_E_Avg    | dimless | dielectric permittivity from 5TM probe with ID 7 |
-| SS_8_E_Avg    | dimless | dielectric permittivity from 5TM probe with ID 8 |
-| SS_9_E_Avg    | dimless | dielectric permittivity from 5TM probe with ID 9 |
-| SS_A_E_Avg    | dimless | dielectric permittivity from 5TM probe with ID A |
-| SS_B_E_Avg    | dimless | dielectric permittivity from 5TM probe with ID B |
-| SS_C_E_Avg    | dimless | dielectric permittivity from 5TM probe with ID C |
+| SS_7_VWC_Avg  | m^3/m^3 | volumetric water content from 5TM probe with ID 7 |
+| SS_8_VWC_Avg  | m^3/m^3 | volumetric water content from 5TM probe with ID 8 |
+| SS_9_VWC_Avg  | m^3/m^3 | volumetric water content from 5TM probe with ID 9 |
+| SS_A_VWC_Avg  | m^3/m^3 | volumetric water content from 5TM probe with ID A |
+| SS_B_VWC_Avg  | m^3/m^3 | volumetric water content from 5TM probe with ID B |
+| SS_C_VWC_Avg  | m^3/m^3 | volumetric water content from 5TM probe with ID C |
+| SS_7_E_Avg    | dimless | apparent dielectric permittivity from 5TM probe with ID 7 |
+| SS_8_E_Avg    | dimless | apparent dielectric permittivity from 5TM probe with ID 8 |
+| SS_9_E_Avg    | dimless | apparent dielectric permittivity from 5TM probe with ID 9 |
+| SS_A_E_Avg    | dimless | apparent dielectric permittivity from 5TM probe with ID A |
+| SS_B_E_Avg    | dimless | apparent dielectric permittivity from 5TM probe with ID B |
+| SS_C_E_Avg    | dimless | apparent dielectric permittivity from 5TM probe with ID C |
 
 
 ## Licensing
@@ -140,7 +144,7 @@ curve.
   [2019-10-24](http://web.archive.org/web/20191025003939/https://s.campbellsci.com/documents/us/manuals/cr1000.pdf).
   Online: <https://s.campbellsci.com/documents/us/manuals/cr1000.pdf>
 
-* <a href="user-manual" />Decagon Devices. *5TM Water Content and Temperature
+* <a name="user-manual" />Decagon Devices. *5TM Water Content and Temperature
   Sensors Operator's Manual.* Version 0.
 
 * O'Keeffe, Patrick. *Vineyard Pilot Study Eddy Flux Tower Program.* Retrieved

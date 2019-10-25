@@ -140,7 +140,7 @@ curve.
   [2019-10-24](http://web.archive.org/web/20191025003939/https://s.campbellsci.com/documents/us/manuals/cr1000.pdf).
   Online: <https://s.campbellsci.com/documents/us/manuals/cr1000.pdf>
 
-* <a href="user-manual"/>Decagon Devices. *5TM Water Content and Temperature
+* <a href="user-manual"></a>Decagon Devices. *5TM Water Content and Temperature
   Sensors Operator's Manual.* Version 0.
 
 * O'Keeffe, Patrick. *Vineyard Pilot Study Eddy Flux Tower Program.* Retrieved

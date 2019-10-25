@@ -6,10 +6,10 @@
 '
 'THE SOFTWARE Is PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD To THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE For ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, Data OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-'Specify thermocouple, valid options = {TypeT, TypeE, TypeK, TypeJ, TypeB,
-'TypeR, TypeS, TypeN}
-Const TC_TYPE = TypeT
 
+'Specify thermocouple type
+'Valid options = {TypeT, TypeE, TypeK, TypeJ, TypeB, TypeR, TypeS, TypeN}
+Const TC_TYPE = TypeK
 
 'Specify program timing
 Const SCAN_INTV = 5 'seconds, how frequently to query sensors
@@ -169,11 +169,8 @@ BeginProg
   SerialOpen(ComRS232,115200,0,0,SERIAL_BUFF)
 
 	Scan (SCAN_INTV,Sec,0,0)
-	  
     PanelTemp(panel_tmpr,_60Hz)
 	  TCDiff(tcdata,4,mV25,1,TC_TYPE,panel_tmpr,1,0,_60Hz,1,0)
-
-
 
     SDI12Recorder(SS_7_E,SDI_PORT,"7","M!",1,0)
     If (SS_7_E = NAN) Then

@@ -1,4 +1,4 @@
-'Acquire data from soil probes and thermocouples, and send to DAQFactory
+'Acquire Data from soil probe AND thermocouples, AND send To DAQFactory
 ' 
 'Copyright 2019 Patrick O'Keeffe <pokeeffe@wsu.edu> for Washington State University
 '
@@ -13,67 +13,29 @@ Const TC_TYPE = TypeK
 
 'Specify program timing
 Const SCAN_INTV = 5 'seconds, how frequently to query sensors
-Const DATA_INTV = 60 'seconds, how often to write data to table/serial port
+Const DATA_INTV = 5 'seconds, how often to write data to table/serial port
 
-'Specify port for SDI comms
-Const SDI_PORT = 1 'C1
+' T/RH probe
+' wired to SDI-12 input C1
+Public cs215(2)
+Alias cs215(1) = CS215_T
+Alias cs215(2) = CS215_RH
+Units CS215_T = degC
+Units CS215_RH = percent
 
-
-' Thermocouple inputs
+' Thermocouple inputs, DF1-4 respectively
 Public panel_tmpr
 Public tcdata(4)
-Alias tcdata(1) = TC1_tmpr
-Alias tcdata(2) = TC2_tmpr
+Alias tcdata(1) = TC1_tmpr  'bottom temp
+Alias tcdata(2) = TC2_tmpr  'middle temp
 Alias tcdata(3) = TC3_tmpr
-Alias tcdata(4) = TC4_tmpr
+Alias tcdata(4) = TC4_tmpr  'air temp
 Units panel_tmpr = degC
 Units tcdata = degC
 
-'Soil moisture/tmpr probe inputs
-'HINT: SS = soil sensor
-Public sdidata(6*3)
-Alias sdidata(1)  = SS_7_E
-Alias sdidata(2)  = SS_7_T
-Alias sdidata(3)  = SS_7_VWC
-Alias sdidata(4)  = SS_8_E
-Alias sdidata(5)  = SS_8_T
-Alias sdidata(6)  = SS_8_VWC
-Alias sdidata(7)  = SS_9_E
-Alias sdidata(8)  = SS_9_T
-Alias sdidata(9)  = SS_9_VWC
-Alias sdidata(10) = SS_A_E
-Alias sdidata(11) = SS_A_T
-Alias sdidata(12) = SS_A_VWC
-Alias sdidata(13) = SS_B_E
-Alias sdidata(14) = SS_B_T
-Alias sdidata(15) = SS_B_VWC
-Alias sdidata(16) = SS_C_E
-Alias sdidata(17) = SS_C_T
-Alias sdidata(18) = SS_C_VWC
-Units SS_7_E   = dimless
-Units SS_7_T   = degC
-Units SS_7_VWC = m^3/m^3
-Units SS_8_E   = dimless
-Units SS_8_T   = degC
-Units SS_8_VWC = m^3/m^3
-Units SS_9_E   = dimless
-Units SS_9_T   = degC
-Units SS_9_VWC = m^3/m^3
-Units SS_A_E   = dimless
-Units SS_A_T   = degC
-Units SS_A_VWC = m^3/m^3
-Units SS_B_E   = dimless
-Units SS_B_T   = degC
-Units SS_B_VWC = m^3/m^3
-Units SS_C_E   = dimless
-Units SS_C_T   = degC
-Units SS_C_VWC = m^3/m^3
-
-
 Const SERIAL_BUFF = 80
 Const CRLF = CHR(13) & CHR(10) '<CR><LF> delimiter
-Dim outdata(22)
-
+Dim outdata(6)
 
 DataTable(compost_soil,True,-1)
   'No cardout() instruction
@@ -82,143 +44,43 @@ DataTable(compost_soil,True,-1)
   Average(1,TC2_tmpr,IEEE4,TC2_tmpr=NAN)
   Average(1,TC3_tmpr,IEEE4,TC3_tmpr=NAN)
   Average(1,TC4_tmpr,IEEE4,TC4_tmpr=NAN)
-  
-  Average(1,SS_7_T,IEEE4,SS_7_T=NAN)     'outdata(5)
-  Average(1,SS_8_T,IEEE4,SS_8_T=NAN)
-  Average(1,SS_9_T,IEEE4,SS_9_T=NAN)
-  Average(1,SS_A_T,IEEE4,SS_A_T=NAN)
-  Average(1,SS_B_T,IEEE4,SS_B_T=NAN)
-  Average(1,SS_C_T,IEEE4,SS_C_T=NAN)
-  Average(1,SS_7_VWC,IEEE4,SS_7_VWC=NAN) 'outdata(11)
-  Average(1,SS_8_VWC,IEEE4,SS_8_VWC=NAN)
-  Average(1,SS_9_VWC,IEEE4,SS_9_VWC=NAN)
-  Average(1,SS_A_VWC,IEEE4,SS_A_VWC=NAN)
-  Average(1,SS_B_VWC,IEEE4,SS_B_VWC=NAN)
-  Average(1,SS_C_VWC,IEEE4,SS_C_VWC=NAN)
-  Average(1,SS_7_E,IEEE4,SS_7_E=NAN)     'outdata(17)
-  Average(1,SS_8_E,IEEE4,SS_8_E=NAN)
-  Average(1,SS_9_E,IEEE4,SS_9_E=NAN)
-  Average(1,SS_A_E,IEEE4,SS_A_E=NAN)
-  Average(1,SS_B_E,IEEE4,SS_B_E=NAN)
-  Average(1,SS_C_E,IEEE4,SS_C_E=NAN)
-EndTable
-
-
-DisplayMenu("Compost soil probes",-2)
+  Average(1,CS215_T,IEEE4,CS215_T=NAN)
+  Average(1,CS215_RH,IEEE4,CS215_RH=NAN)
+ EndTable
+ 
+DisplayMenu("Compost sensors",-2)
   DisplayValue("TC DF1", TC1_tmpr)
   DisplayValue("TC DF2", TC2_tmpr)
   DisplayValue("TC DF3", TC3_tmpr)
   DisplayValue("TC DF4", TC4_tmpr)
-  DisplayValue("SS #7 tmpr", SS_7_T)
-  DisplayValue("SS #8 tmpr", SS_8_T)
-  DisplayValue("SS #9 tmpr", SS_9_T)
-  DisplayValue("SS #A tmpr", SS_A_T)
-  DisplayValue("SS #B tmpr", SS_B_T)
-  DisplayValue("SS #C tmpr", SS_C_T)
-  
-  DisplayValue("SS #7 vwc", SS_7_VWC)
-  DisplayValue("SS #8 vwc", SS_8_VWC)
-  DisplayValue("SS #9 vwc", SS_9_VWC)
-  DisplayValue("SS #A vwc", SS_A_VWC)
-  DisplayValue("SS #B vwc", SS_B_VWC)
-  DisplayValue("SS #C vwc", SS_C_VWC)
-
-  DisplayValue("SS #7 E", SS_7_E)
-  DisplayValue("SS #8 E", SS_8_E)
-  DisplayValue("SS #9 E", SS_9_E)
-  DisplayValue("SS #A E", SS_A_E)
-  DisplayValue("SS #B E", SS_B_E)
-  DisplayValue("SS #C E", SS_C_E)
+  DisplayValue("Tmpr", CS215_T)
+  DisplayValue("RH", CS215_RH)
 EndMenu
-
-
-Function Topp_equation( dielectric )
-  'Calculate volumetric water content using Topp equation (Topp et al 1980)
-  Return 4.3e-6*dielectric^3 - 5.5e-4*dielectric^2 + 2.92e-2*dielectric - 5.3e-2
-EndFunction
-
 
 Sub report_to_daqfactory()
   'Create and send strings to serial port "ComRS232" (front panel DB9)
   Dim msg As String * SERIAL_BUFF
   
-  Sprintf(msg,"TC,%f,%f,%f,%f",outdata(1),outdata(2),outdata(3),outdata(4))
+  Sprintf(msg,"TC,%f,%f,%f,%f,%f,%f",outdata(1),outdata(2),outdata(3),outdata(4),outdata(5),outdata(6))
   SerialOut(ComRS232,msg & CRLF,"",0,0)
   Delay(1,1,Sec)
-  Sprintf(msg,"SS,7,%f,%f,%f",outdata(5),outdata(11),outdata(17))
-  SerialOut(ComRS232,msg & CRLF,"",0,0)
-  Delay(1,1,Sec)
-  Sprintf(msg,"SS,8,%f,%f,%f",outdata(6),outdata(12),outdata(18))
-  SerialOut(ComRS232,msg & CRLF,"",0,0)
-  Delay(1,1,Sec)
-  Sprintf(msg,"SS,9,%f,%f,%f",outdata(7),outdata(13),outdata(19))
-  SerialOut(ComRS232,msg & CRLF,"",0,0)
-  Delay(1,1,Sec)
-  Sprintf(msg,"SS,A,%f,%f,%f",outdata(8),outdata(14),outdata(20))
-  SerialOut(ComRS232,msg & CRLF,"",0,0)
-  Delay(1,1,Sec)
-  Sprintf(msg,"SS,B,%f,%f,%f",outdata(9),outdata(15),outdata(21))
-  SerialOut(ComRS232,msg & CRLF,"",0,0)
-  Delay(1,1,Sec)
-  Sprintf(msg,"SS,C,%f,%f,%f",outdata(10),outdata(16),outdata(22))
-  SerialOut(ComRS232,msg & CRLF,"",0,0)
 EndSub
-
 
 BeginProg
   SerialOpen(ComRS232,115200,0,0,SERIAL_BUFF)
 
 	Scan (SCAN_INTV,Sec,0,0)
+
+	SDI12Recorder(cs215(),1,"0","M!",1,0)
+
     PanelTemp(panel_tmpr,_60Hz)
-	  TCDiff(tcdata,4,mV25,1,TC_TYPE,panel_tmpr,1,0,_60Hz,1,0)
+    TCDiff(tcdata,4,mV25,1,TC_TYPE,panel_tmpr,1,0,_60Hz,1,0)
 
-    SDI12Recorder(SS_7_E,SDI_PORT,"7","M!",1,0)
-    If (SS_7_E = NAN) Then
-      Move(SS_7_T,2,NAN,1)
-    Else
-      SS_7_VWC = Topp_equation(SS_7_E)
-    EndIf
-
-    SDI12Recorder(SS_8_E,SDI_PORT,"8","M!",1,0)
-    If (SS_8_E = NAN) Then
-      Move(SS_8_T,2,NAN,1)
-    Else
-      SS_8_VWC = Topp_equation(SS_8_E)
-    EndIf
-
-    SDI12Recorder(SS_9_E,SDI_PORT,"9","M!",1,0)
-    If (SS_9_E = NAN) Then
-      Move(SS_9_T,2,NAN,1)
-    Else
-      SS_9_VWC = Topp_equation(SS_9_E)
-    EndIf
-
-    SDI12Recorder(SS_A_E,SDI_PORT,"A","M!",1,0)
-    If (SS_A_E = NAN) Then
-      Move(SS_A_T,2,NAN,1)
-    Else
-      SS_A_VWC = Topp_equation(SS_A_E)
-    EndIf
-
-    SDI12Recorder(SS_B_E,SDI_PORT,"B","M!",1,0)
-    If (SS_B_E = NAN) Then
-      Move(SS_B_T,2,NAN,1)
-    Else
-      SS_B_VWC = Topp_equation(SS_B_E)
-    EndIf
-
-    SDI12Recorder(SS_C_E,SDI_PORT,"C","M!",1,0)
-    If (SS_C_E = NAN) Then
-      Move(SS_C_T,2,NAN,1)
-    Else
-      SS_C_VWC = Topp_equation(SS_C_E)
-    EndIf
-    
-    CallTable(compost_soil)
+	 CallTable(compost_soil)
     If (compost_soil.Output(1,1)) Then
       GetRecord(outdata(1),compost_soil,1)
       report_to_daqfactory()
     EndIf
 	NextScan
 EndProg
-
+   >        

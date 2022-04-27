@@ -31,7 +31,7 @@ Four Type K thermocouples are connected to differential inputs 1-4:
 ### Soil moisture/temperature probes
 
 Six soil moisture & temperature probes
-([5TM; METER Group](https://www.metergroup.com/environment/articles/meter-legacy-soil-moisture-sensors/))
+([5TM; Decagon Devices](https://web.archive.org/web/20150512214403/http://www.decagon.com/products/soils/volumetric-water-content-sensors/5tm-vwc-temp))
 are connected to the first SDI-12 port using three sets of screw terminals.
 
 The SDI-12 addresses of the sensors are `7`, `8`, `9`, `A`, `B`, `C`. The
@@ -43,9 +43,9 @@ the sensor.
 
 | Description | Color  | CR1000 |
 |-------------|:------:|:------:|
-| Power input | white  | C1     |
+| Power input | white  | 12V    |
 | Ground      | *bare* | G      |
-| Data output | red    | 12V    |
+| Data output | red    | C1     |
 
 ### DAQFactory Computer
 
@@ -145,9 +145,7 @@ curve.
   Online: <https://s.campbellsci.com/documents/us/manuals/cr1000.pdf>
 
 * <a name="user-manual" />Decagon Devices. *5TM Water Content and Temperature
-  Sensors Operator's Manual.* Version 0.
+  Sensors Operator's Manual.* Version [July 10, 2017](https://web.archive.org/web/20171006170216/http://manuals.decagon.com/Manuals/13441_5TM_Web.pdf).
+  Online: <http://library.metergroup.com/Retired%20and%20Discontinued/Manuals/13441_5TM_Web.pdf>
 
-* O'Keeffe, Patrick. *Vineyard Pilot Study Eddy Flux Tower Program.* Retrieved
-  [2019-10-24](https://github.com/patricktokeeffe/2015-vineyard-eddyflux-tower/commit/bbd5e890accc49a4277fa2494571d528c783dc85).
-  Online: <https://github.com/patricktokeeffe/2015-vineyard-eddyflux-tower>
 

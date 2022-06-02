@@ -65,25 +65,19 @@ computer to the `RS-232` port of the CR1000. The serial port configuration is:
 * Parity: `none`
 * Stop bits: `1`
 
-A new record is generated after each scan and reported out the RS-232 serial port.
+Copy the custom protocol file `CR1000.ddp` into the DAQFactory installation folder
+and restart DAQFactory. Then create a new serial device using the above settings
+and specify the custom protocol "CR1000" for that device.
+
+One serial data record is sent by the datalogger after each scan.
 
 * Each record:
     * is prefixed with `TC`
     * and is delimited with a carriage return and line feed (`\r\n`)
 	* contains thermocouple (TC) data for differential input channels
-  1, 2, 3, and 4, respectively.
-* Note: only thermocouple data is included in the serial output record. Data
-  from the ambient temperature/RH probe is only stored locally on the logger.
-
-Example CR1000 serial port output (non-printing characters shown for clarity)
-is shown below.
-*(Only thermocouple DF1 is attached in this example data stream... disregard
-the strange temperature values.)*
-
-```
-TC,22.578640,-76.386620,91.653840,109.250300\r\n
-```
-
+  1, 2, 3, and 4, respectively
+* However:
+    * the DAQFactory protocol file skips over thermocouple #3 (not connected)
 
 ## Data Products
 
